@@ -19,14 +19,14 @@ typedef struct Node {
     struct Node *more;
 } Node;
 
+/*
 
-
-Node *create(Node *root, int data)
+Node *create(Node *root, int key)
 {
 // Выделение памяти под корень дерева
     Node *tmp = malloc(sizeof(Node));
 // Присваивание значения ключу
-    tmp -> value = data;
+    tmp -> value = key;
 // Присваивание указателю на родителя значения NULL
     tmp -> parent = NULL;
 // Присваивание указателю на левое и правое поддерево значения NULL
@@ -34,36 +34,53 @@ Node *create(Node *root, int data)
     root = tmp;
     return root;
 }
+*/
 
-
-Node *add(Node *root, int key)
-{
+Node *add(Node *root, int key) {
     Node *root2 = root, *root3 = NULL;
 // Выделение памяти под узел дерева
     Node *tmp = malloc(sizeof(Node));
 // Присваивание значения ключу
-    tmp -> key = key;
+    tmp -> value = key;
 /* Поиск нужной позиции для вставки (руководствуемся правилом 
 вставки элементов, см. начало статьи, пункт 3) */
     while (root2 != NULL)
     {
         root3 = root2;
-        if (key < root2 -> key)
-            root2 = root2 -> left;
+        if (key < root2 -> value)
+            root2 = root2 -> less;
         else
-            root2 = root2 -> right;
+            root2 = root2 -> more;
     }
 /* Присваивание указателю на родителя значения указателя root3 
 (указатель root3 был найден выше) */
     tmp -> parent = root3;
 // Присваивание указателю на левое и правое поддерево значения NULL
-    tmp -> left = NULL;
-    tmp -> right = NULL;
+    tmp -> less = NULL;
+    tmp -> more = NULL;
 /* Вставляем узел в дерево (руководствуемся правилом
 вставки элементов, см. начало статьи, пункт 3) */
-    if (key < root3 -> key) root3 -> left = tmp;
-    else root3 -> right = tmp;
+    if (key < root3 -> value) root3 -> less = tmp; //Не работает
+    else root3 -> more = tmp;
+    printf("%d Added\n", root3 -> value);
     return root;
+}
+
+
+
+
+Node *search(Node * root, int data)
+{
+// Если дерево пусто или ключ корня равен искомому ключу, то возвращается указатель на корень
+    printf("Searching\n");
+    if ((root == NULL) || (root -> value == data))
+        printf("No element\n");
+        return root;
+// Поиск нужного узла
+    printf ("%d ->", root -> value);
+    if (data < root -> value)
+        return search(root -> less, data);
+    else return search(root -> less, data);
 }
 
 
@@ -87,13 +104,31 @@ void RandArr(int *arr, int size) {
 }
 
 
+void FromArray(int *arr, int n, Node *root) {
+
+    //create(root, arr[0]);
+
+    for (int i = 1; i<n; i++){
+
+        add(root, arr[i]);
+        puts("abobus");
+        printf("%d added\n", arr[i]);
+    }
+    printf("\n");
+}
+
+
+
+
+
 
 
 
 int main() {
     int n;
-    int key;
 
+
+/*
     srand(time(NULL));
 
     printf("Len of arr: ");
@@ -104,7 +139,40 @@ int main() {
     RandArr (arr, n);
     PrintArray (arr, n);
 
+    FromArray (arr, n, root);
+
    
     free(arr);
+*/
+
+ //   create(root, 8);
+
+
+    Node* root = malloc(sizeof(Node));
+    root -> value = 8;
+
+    root -> parent = NULL;
+    root -> less = root -> more = NULL;
+
+
+
+    search(root, 8);
+    puts ("asda");
+    add(root, 3);
+    add(root, 10);
+    add(root, 1);
+    add(root, 6);
+    add(root, 4);
+    add(root, 7);
+    add(root, 14);
+    add(root, 13);
+
+    puts ("da");
+
+    search(root, 13);
+    search(root, 6);
+
+    puts ("dass");
+
     return 0;
 }
