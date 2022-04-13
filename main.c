@@ -19,6 +19,27 @@ typedef struct Node {
 } Node;
 
 
+
+// Минимальный элемент поддерева
+Node *TreeMin(Node *root) {
+    Node *l = root;
+    while (l -> less != NULL)
+        l = l -> less;
+    return l;
+}
+
+// Максимальный элемент поддерева
+Node *TreeMax(Node *root) {
+    Node *r = root;
+    while (r -> more != NULL)
+        r = r -> more;
+    return r;
+}
+
+
+
+
+
 Node *add(Node *root, int key) {
     Node *root2 = root, *root3 = NULL;
     Node *tmp = malloc(sizeof(Node));
@@ -43,12 +64,14 @@ Node *add(Node *root, int key) {
     /* Вставляем узел в дерево (руководствуемся правилом
     вставки элементов, см. начало статьи, пункт 3) */
     if (key < root3->value)
-        root3->less = tmp; //Не работает
+        root3->less = tmp;
     else
         root3->more = tmp;
     printf("%d Added\n", key);
     return root;
 }
+
+
 
 Node *search(Node *root, int data) {   
     if (root == NULL) {
@@ -68,6 +91,75 @@ Node *search(Node *root, int data) {
         return root;
     }
 }
+
+
+
+Node *succ(Node *root)
+{
+    Node *p = root, *l = NULL;
+// Если есть правое поддерево, то ищем минимальный элемент в этом поддереве
+    if (p -> more != NULL)
+        //return min(p -> right);
+/* Правое дерево пусто, идем по родителям до тех пор,
+пока не найдем родителя, для которого наше поддерево левое */
+    l = p -> parent;
+    while ((l != NULL) && (p == l -> more))
+    {
+        p = l;
+        l = l -> parent;
+    }
+    return l;
+}
+
+
+
+Node *delete(Node *root, Node *desired) {
+// Поиск удаляемого узла по ключу
+    Node *p = root, *l = desired, *m = NULL;
+// 1 случай
+    if ((l -> less == NULL) && (l -> more == NULL))
+    {
+        m = l -> parent;
+        if (l == m -> more) m -> less = NULL;
+        else m -> less = NULL;
+        free(l);
+    }
+// 2 случай, 1 вариант - поддерево справа
+    if ((l -> less == NULL) && (l -> more != NULL))
+    {
+        m = l -> parent;
+        if (l == m -> more) m -> more = l -> more;
+        else m -> less = l -> more;
+        free(l);
+    }
+// 2 случай, 2 вариант - поддерево слева
+    if ((l -> less != NULL) && (l -> more == NULL))
+    {
+        m = l -> parent;
+        if (l == m -> more) m -> more = l -> less;
+        else m -> less = l -> more;
+        free(l);
+    }
+// 3 случай
+    if ((l -> less != NULL) && (l -> more != NULL))
+    {
+        /*
+        m = succ(l);
+        l -> key = m -> key;
+        if (m -> right == NULL)
+            m -> parent -> left = NULL;
+        else m -> parent -> left = m -> right;
+        */
+        free(m);
+        
+    }
+    return root;
+}
+
+
+
+
+
 
 void PrintArray(int *arr, int n) {
     for (int i = 0; i < n; i++) {
@@ -138,6 +230,7 @@ int main() {
             if (desired){
                 printf("%d deliting\n", desired -> value);
             }
+
             
             break;
         
