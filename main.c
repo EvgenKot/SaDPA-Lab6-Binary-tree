@@ -136,46 +136,40 @@ Node *delete(Node *desired) {
     if ((TargetNode -> less != NULL) && (TargetNode -> more != NULL)) {
         tmp = succ(TargetNode); //При одиновковой глубине указывает на большее 'о'
 
-
-    //Если перемещаем из большего поддерева
-        if (tmp -> less == NULL){
-            if (tmp -> parent -> less == tmp)
-                tmp -> parent -> less = NULL;
-            else
-                tmp -> parent -> more = NULL;
-        }
-            
-    //Eсли перемещаем ищ меньшего поддерева
-        else if (tmp -> more == NULL){
-            if (tmp -> parent-> more == tmp)
-                tmp -> parent -> more = NULL;
-            else
-                tmp -> parent -> less = NULL;
-        }
-
-        tmp -> more = TargetNode -> more;
-        tmp -> less = TargetNode -> less;
-
+        if (tmp -> parent -> more == tmp)
+            tmp -> less = TargetNode -> less;
         
+        else if (tmp -> parent -> less == tmp)
+            tmp -> more = TargetNode -> more;
+
+        else {
+        //Если перемещаем из большего поддерева
+            if (tmp -> less == NULL){
+                if (tmp -> parent -> less == tmp)
+                    tmp -> parent -> less = NULL;
+                else
+                    tmp -> parent -> more = NULL;
+            }
+                
+        //Eсли перемещаем ищ меньшего поддерева
+            else if (tmp -> more == NULL){
+                if (tmp -> parent-> more == tmp)
+                    tmp -> parent -> more = NULL;
+                else
+                    tmp -> parent -> less = NULL;
+            }
+
+            tmp -> more = TargetNode -> more;
+            tmp -> less = TargetNode -> less;
+
+        }
+
         if (TargetNode -> parent -> more == TargetNode)
             TargetNode -> parent -> more = tmp;
         else if (TargetNode -> parent -> less == TargetNode)
             TargetNode -> parent -> less = tmp;
         free(TargetNode);
         
-    /*
-        tmp -> less = TargetNode -> less;
-        tmp -> parent = TargetNode -> parent;
-        TargetNode -> parent -> more = tmp;
-
-
-        TargetNode -> value = tmp -> value;
-        if (tmp -> more == NULL)
-            tmp -> parent -> less = NULL;
-        else tmp -> parent -> less = tmp -> more;
-
-        free(tmp);
-    */
     }
     return desired;
 }
