@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <conio.h>
 
 /*
@@ -19,7 +18,7 @@ typedef struct Node {
 } Node;
 
 
-
+//Добавление узла в дерево
 Node *add(Node *root, int key) {
     Node *root2 = root, *root3 = NULL;
     Node *tmp = malloc(sizeof(Node));
@@ -47,7 +46,7 @@ Node *add(Node *root, int key) {
 }
 
 
-
+//Поиск и возвращение узла в деерве
 Node *search(Node *root, int data) {   
     if (root == NULL) {
         printf("\n No element %d\n", data);
@@ -88,7 +87,7 @@ Node *TreeMax(Node *root, int *depth) {
     return MoreNode;
 }
 
-
+//Элемент наиболее пригодный для удаления
 Node *succ(Node *root)
 {
     int MinMoreDepth = 0, MaxLessDepth = 0;
@@ -106,7 +105,7 @@ Node *succ(Node *root)
 }
 
 
-
+//Удаление узла
 Node *delete(Node *desired) {
 // Поиск удаляемого узла по ключу
     Node *TargetNode = desired, *tmp = NULL;
@@ -114,45 +113,50 @@ Node *delete(Node *desired) {
     if ((TargetNode -> less == NULL) && (TargetNode -> more == NULL))
     {
         tmp = TargetNode -> parent;
-        if (TargetNode == tmp -> more) tmp -> less = NULL;
-        else tmp -> less = NULL;
+        if (TargetNode == tmp -> more) 
+            tmp -> more = NULL;
+        else 
+            tmp -> less = NULL;
         free(TargetNode);
     }
 //поддерево справа
     if ((TargetNode -> less == NULL) && (TargetNode -> more != NULL)) {
         tmp = TargetNode -> parent;
-        if (TargetNode == tmp -> more) tmp -> more = TargetNode -> more;
-        else tmp -> less = TargetNode -> more;
+        if (TargetNode == tmp -> more) 
+            tmp -> more = TargetNode -> more;
+        else 
+            tmp -> less = TargetNode -> more;
         free(TargetNode);
     }
 //поддерево слева
     if ((TargetNode -> less != NULL) && (TargetNode -> more == NULL)) {
         tmp = TargetNode -> parent;
-        if (TargetNode == tmp -> more) tmp -> more = TargetNode -> less;
-        else tmp -> less = TargetNode -> more;
+        if (TargetNode == tmp -> more)
+            tmp -> more = TargetNode -> less;
+        else 
+            tmp -> less = TargetNode -> less;
         free(TargetNode);
     }
 //2 поддерева
     if ((TargetNode -> less != NULL) && (TargetNode -> more != NULL)) {
-        tmp = succ(TargetNode); //При одиновковой глубине указывает на большее 'о'
-
+        tmp = succ(TargetNode); //При одиновковой глубине указывает на большее
+    //Если перемещается соседний элемент больший чем удаляемый узел
         if (tmp -> parent -> more == tmp)
             tmp -> less = TargetNode -> less;
-        
+    //Если перемещается соседний элемент меньший чем удаляемый узел
         else if (tmp -> parent -> less == tmp)
             tmp -> more = TargetNode -> more;
 
         else {
-        //Если перемещаем из большего поддерева
-            if (tmp -> less == NULL){
+        //Если перемещаем элемент из большего поддерева
+            if (tmp -> less == NULL) {
                 if (tmp -> parent -> less == tmp)
                     tmp -> parent -> less = NULL;
                 else
                     tmp -> parent -> more = NULL;
             }
-                
-        //Eсли перемещаем ищ меньшего поддерева
-            else if (tmp -> more == NULL){
+        //Eсли перемещаем элемент из меньшего поддерева
+            else if (tmp -> more == NULL) {
                 if (tmp -> parent-> more == tmp)
                     tmp -> parent -> more = NULL;
                 else
@@ -175,8 +179,43 @@ Node *delete(Node *desired) {
 }
 
 
+//Прямой обход
+void preorder(Node *root)
+{
+    if (root == NULL)
+        return;
+    if (root != NULL)
+        printf("%d ", root -> value);
+    preorder(root -> less);
+    preorder(root -> more);
+}
 
 
+//Обратный ход
+void postorder(Node *root)
+{
+    if (root == NULL)
+        return;
+    postorder(root -> less);
+    postorder(root -> more);
+    if (root -> value)
+        printf("%d ", root -> value);
+}
+
+//Освобождение памяти
+void TreeFree(Node *root)
+{
+    if (root == NULL)
+        return;
+    TreeFree(root -> less);
+    TreeFree(root -> more);
+    if (root -> value)
+        printf("free %d \n", root -> value);
+    root -> less = NULL;
+    root -> more = NULL;
+    root -> parent = NULL;
+    free(root);
+}
 
 
 void PrintArray(int *arr, int n) {
@@ -186,6 +225,7 @@ void PrintArray(int *arr, int n) {
     printf("\n");
 }
 
+
 void RandArr(int *arr, int size) {
     int i;
     for (i = 0; i < size; i++) {
@@ -193,27 +233,32 @@ void RandArr(int *arr, int size) {
     }
 }
 
-
+//Перемещение из массива в бинарное дерево
 void FromArray(int *arr, int size, Node *root) {
-    root->value = arr[0];
+    int i = 0;
+    root->value = arr[i];
     root->parent = NULL;
     root->less = root->more = NULL;
-    for (int i = 1; i < size; i++) {
+    i++;
+    for (i; i < size; i++) {
         add(root, arr[i]);
     }
-    printf("\n");
 }
+
 
 void Menu(){
     printf("/=====================/\n");
-    printf("        Menu\n");
+    printf("         Menu\n");
     printf("/=====================/\n");
     printf("1. Add\n");
     printf("2. Search\n");
     printf("3. Search and delete\n");
+    printf("4. Forward order\n");
+    printf("5. Backward order\n");
     printf("0. Exit\n");
     printf(">>");
 }
+
 
 int main() {
     Node *root = malloc(sizeof(Node));
@@ -221,42 +266,51 @@ int main() {
     int n = sizeof(arr)/sizeof(int);
     FromArray (arr, n, root);
 
-
     int value;
     int choise = 1;
     while (choise){
         getch();
+        system("cls");
         Menu();
         scanf("%d", &choise);
-        switch (choise)
-        {
+        switch (choise) {
         case 1:
-            printf(">>");
+            printf("element>>");
             scanf("%d", &value);
             add(root, value);
             break;
         
         case 2:
-            printf(">>");
+            printf("element>>");
             scanf("%d", &value);
             search(root, value);
             break;
         
         case 3:
-            printf(">>");
+            printf("element>>");
             scanf("%d", &value);
             Node *desired = search(root, value);
             if (desired){
-                printf("%d deleting\n", desired -> value);
+                printf("%d Deleting\n", desired -> value);
                 delete(desired);
                 printf("Deleted.\n");
             }
-
-            
+            break;
+        
+        case 4:
+            preorder(root);
+            printf("\n");
+            break;
+        
+        case 5:
+            postorder(root);
+            printf("\n");
             break;
         
         case 0:
-            printf("Stopped.");
+            printf("Stop...\n");
+            TreeFree(root);
+            printf("Stopped.\n");
             break;
         
         default:
@@ -265,6 +319,5 @@ int main() {
         }
         
     }
-
     return 0;
 }
