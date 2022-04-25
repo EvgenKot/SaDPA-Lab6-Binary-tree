@@ -81,7 +81,7 @@ Node *TreeMin(Node *root, int *depth)
     return LessNode;
 }
 
-// Максимальный элемент поддерева
+//Максимальный элемент поддерева
 Node *TreeMax(Node *root, int *depth)
 {
     Node *MoreNode = root;
@@ -113,7 +113,7 @@ Node *succ(Node *root)
 //Удаление узла
 Node *delete (Node *desired)
 {
-    // Поиск удаляемого узла по ключу
+    //Поиск удаляемого узла по ключу
     Node *TargetNode = desired, *tmp = NULL;
     //узел без дочерних элементов
     if ((TargetNode->less == NULL) && (TargetNode->more == NULL))
@@ -147,10 +147,10 @@ Node *delete (Node *desired)
     {
         tmp = succ(TargetNode); //При одиновковой глубине указывает на большее
                                 //Если перемещается соседний элемент больший чем удаляемый узел
-        if (tmp->parent->more == tmp)
+        if (TargetNode->more == tmp)
             tmp->less = TargetNode->less;
         //Если перемещается соседний элемент меньший чем удаляемый узел
-        else if (tmp->parent->less == tmp)
+        else if (TargetNode->less == tmp)
             tmp->more = TargetNode->more;
 
         else
@@ -175,15 +175,19 @@ Node *delete (Node *desired)
             tmp->more = TargetNode->more;
             tmp->less = TargetNode->less;
         }
-
-        if (TargetNode->parent->more == TargetNode)
-            TargetNode->parent->more = tmp;
-        else if (TargetNode->parent->less == TargetNode)
-            TargetNode->parent->less = tmp;
-        tmp->parent = TargetNode->parent;
+        if (TargetNode->parent)
+        {
+            if (TargetNode->parent->more == TargetNode)
+                TargetNode->parent->more = tmp;
+            else if (TargetNode->parent->less == TargetNode)
+                TargetNode->parent->less = tmp;
+            tmp->parent = TargetNode->parent;
+        }
+        else
+            tmp->parent = NULL;
         free(TargetNode);
     }
-    return desired;
+    return tmp;
 }
 
 //Прямой обход
@@ -305,7 +309,10 @@ int main()
             if (desired)
             {
                 printf("%d Deleting\n", desired->value);
-                delete (desired);
+                if (desired->parent==NULL)
+                    root = delete (desired);
+                else
+                    delete(desired);
                 printf("Deleted.\n");
             }
             break;
